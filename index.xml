@@ -12,6 +12,24 @@
     
     
     <item>
+      <title>Using Lua in Java</title>
+      <link>https://klgraham.github.io/project/embedding-lua-in-c/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://klgraham.github.io/project/embedding-lua-in-c/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Probability Distributions In Clojure</title>
+      <link>https://klgraham.github.io/project/probability-distributions-in-clojure/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://klgraham.github.io/project/probability-distributions-in-clojure/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Tail Recursion In Scala And Clojure</title>
       <link>https://klgraham.github.io/post/tail-recursion-in-scala-and-clojure/</link>
       <pubDate>Fri, 09 Sep 2016 00:00:00 +0000</pubDate>
@@ -39,6 +57,15 @@ What is a Neural Network?</description>
       <guid>https://klgraham.github.io/post/swift-probability-monad/</guid>
       <description>I read about the probability monad in The Frequentist Approach to Probability a couple of years ago and thought it was pretty neat. I decided to make one in Swift, as an exercise in learning the language, after having done the same in Clojure and Java 8.
 If you don’t know what a monad is, don’t worry, it’s not important for this post. Just know that it lets you do neat stuff with probability distributions, programmatically speaking.</description>
+    </item>
+    
+    <item>
+      <title>One-dimensional Particle Physics and BubbleSort</title>
+      <link>https://klgraham.github.io/project/1d-ptcl-physics-bubblesort/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://klgraham.github.io/project/1d-ptcl-physics-bubblesort/</guid>
+      <description></description>
     </item>
     
   </channel>

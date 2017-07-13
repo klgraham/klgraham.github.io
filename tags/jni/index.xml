@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Jni on Continuous Deformation</title>
+    <link>https://klgraham.github.io/tags/jni/</link>
+    <description>Recent content in Jni on Continuous Deformation</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="https://klgraham.github.io/tags/jni/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Using Lua in Java</title>
+      <link>https://klgraham.github.io/project/embedding-lua-in-c/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://klgraham.github.io/project/embedding-lua-in-c/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

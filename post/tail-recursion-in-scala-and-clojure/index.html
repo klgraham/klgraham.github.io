@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+    <head>
+
+        <title>Tail Recursion In Scala And Clojure</title>
+
+        <style>
+
+    html body {
+        font-family: Quicksand, sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: red;
+        --border-width:  5px ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quicksand">
+
+
+ <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/solarized-dark.min.css"> 
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+ 
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/swift.min.js"></script>  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script>  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/java.min.js"></script>  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/kotlin.min.js"></script>  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/scala.min.js"></script> 
+
+    <script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+ <meta name="generator" content="Hugo 0.25.1" />
+
+        <meta charset="utf-8">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    </head>
+
+    <body>
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+
+            <div class="container">
+
+                <div class="navbar-header">
+
+                    <a class="navbar-brand visible-xs" href="#">Tail Recursion In Scala And Clojure</a>
+
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+
+                </div>
+
+                <div class="collapse navbar-collapse">
+
+                    
+                        <ul class="nav navbar-nav">
+                            
+                                <li><a href="/">Home</a></li>
+                            
+                                <li><a href="/post/">Posts</a></li>
+                            
+                        </ul>
+                    
+
+                    
+                        <ul class="nav navbar-nav navbar-right">
+                            
+                                <li class="navbar-icon"><a href="https://github.com/klgraham/"><i class="fa fa-github"></i></a></li>
+                            
+                                <li class="navbar-icon"><a href="https://twitter.com/klogram/"><i class="fa fa-twitter"></i></a></li>
+                            
+                                <li class="navbar-icon"><a href="https://www.linkedin.com/in/klgraham/"><i class="fa fa-linkedin"></i></a></li>
+                            
+                        </ul>
+                    
+
+                </div>
+
+            </div>
+
+        </nav>
+
+
+<main>
+
+    <div class="item">
+
+    
+
+        <h4><a href="/post/tail-recursion-in-scala-and-clojure/">Tail Recursion In Scala And Clojure</a></h4>
+
+        <h5>September 9, 2016</h5>
+
+        
+
+    
+
+</div>
+
+
+    <br> <div class="text-justify"><p>I recently read a <a href="http://www.marcoyuen.com/articles/2016/09/08/stackless-scala-1-the-problem.html" title="Stackless Scala, Part 1: The Problem">blog post</a> about issues with writing purely functional code in Scala. The post talked a bit about a <a href="http://blog.higher-order.com/assets/trampolines.pdf" title="Stackless Scala With Free Monads">paper</a> addressing tail-recursion in Scala. The code example (taken from the paper) was an implementation of zip lists, called zipIndex, that was not properly tail-recursive and would result in a stack overflow for relatively small inputs. A later post from the author will look at ways of addressing the problem and I’m looking forward to reading about it.</p>
+
+<p>I’m wondering if the next post will do something similar to the tail-recursive factorial function.</p>
+
+<pre><code class="language-scala">
+def factorial(n: BigInt): BigInt = {
+    def fact(n: BigInt, result: BigInt): BigInt = {
+        if (n == 0) return result
+        else return fact(n - 1, result * n)
+    }
+    return fact(n, 1)
+}
+</code></pre>
+
+<p>I’d write a zip list in much the same way:</p>
+
+<pre><code class="language-scala">
+def loopRecur[A](index: Int, coll: Seq[A], zippedList: List[(Int, A)]): List[(Int, A)] = {
+    if (coll.isEmpty) return zippedList
+    else return loopRecur(index + 1, coll.tail, zippedList ++ List((index, coll.head)))
+}
+// Given a sequence of items, returns a List of tuples of the form (item index, item)
+def zipIndex[A](coll: Seq[A]): List[(Int, A)] = {
+    return loopRecur(0, coll, List.empty[(Int, A)])
+}
+</code></pre>
+
+<p>The recursion is handled with the function <code>loopRecur</code>, which is named after Clojure’s <a href="https://clojuredocs.org/clojure.core/loop" title="loop">loop</a> and <a href="https://clojuredocs.org/clojure.core/recur" title="recur">recur</a> forms. I’ve tested the above implementation of <code>zipIndex</code> with inputs of up to 100,000 elements. I find the Clojure analog to be somewhat simpler. It&rsquo;s also much faster than the Scala.</p>
+
+<pre><code class="language-clojure">
+(defn zipIndex [coll]
+  (loop [list coll
+         n 0
+         result []]
+    (if (empty? list)
+      result
+      (recur (rest list) (inc n) (conj result [n (first list)])))))
+</code></pre>
+
+<p>To test the Clojure, assuming you have access to a Clojure REPL, you can run <code>(zipList (range 100000))</code> and then be amazed at how much faster the Clojure version runs compared to the Scala (assuming the Scala I wrote above is efficient).</p>
+</div>
+
+    
+    
+
+    
+
+</main>
+
+        <footer>
+
+            <p class="copyright text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+
+        </footer>
+
+    </body>
+
+</html>
+

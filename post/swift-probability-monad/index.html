@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+    <head>
+
+        <title>Probability Monad in Swift</title>
+
+        <style>
+
+    html body {
+        font-family: Quicksand, sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: red;
+        --border-width:  5px ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quicksand">
+
+
+ <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/solarized-dark.min.css"> 
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+ 
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/swift.min.js"></script>  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script>  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/java.min.js"></script>  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/kotlin.min.js"></script>  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/scala.min.js"></script> 
+
+    <script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+ <meta name="generator" content="Hugo 0.25.1" />
+
+        <meta charset="utf-8">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    </head>
+
+    <body>
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+
+            <div class="container">
+
+                <div class="navbar-header">
+
+                    <a class="navbar-brand visible-xs" href="#">Probability Monad in Swift</a>
+
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+
+                </div>
+
+                <div class="collapse navbar-collapse">
+
+                    
+                        <ul class="nav navbar-nav">
+                            
+                                <li><a href="/">Home</a></li>
+                            
+                                <li><a href="/post/">Posts</a></li>
+                            
+                        </ul>
+                    
+
+                    
+                        <ul class="nav navbar-nav navbar-right">
+                            
+                                <li class="navbar-icon"><a href="https://github.com/klgraham/"><i class="fa fa-github"></i></a></li>
+                            
+                                <li class="navbar-icon"><a href="https://twitter.com/klogram/"><i class="fa fa-twitter"></i></a></li>
+                            
+                                <li class="navbar-icon"><a href="https://www.linkedin.com/in/klgraham/"><i class="fa fa-linkedin"></i></a></li>
+                            
+                        </ul>
+                    
+
+                </div>
+
+            </div>
+
+        </nav>
+
+
+<main>
+
+    <div class="item">
+
+    
+
+        <h4><a href="/post/swift-probability-monad/">Probability Monad in Swift</a></h4>
+
+        <h5>March 25, 2016</h5>
+
+        
+
+    
+
+</div>
+
+
+    <br> <div class="text-justify">
+
+<p>I read about the probability monad in <a href="http://jliszka.github.io/2013/08/12/a-frequentist-approach-to-probability.html">The Frequentist Approach to Probability</a> a couple of years ago and thought it was pretty neat. I decided to make one in Swift, as an exercise in learning the language, after having done the same in <a href="https://github.com/klgraham/watershed">Clojure</a> <a href="https://gist.github.com/klgraham/c1bc8fb6accb97e5aa6f" title="Probability Monad in Java 8">and Java 8</a>.</p>
+
+<p>If you don’t know what a monad is, don’t worry, it’s not important for this post. Just know that it lets you do neat stuff with probability distributions, programmatically speaking. Ok… on to the code.</p>
+
+<h2 id="protocols-for-probabilities">Protocols for Probabilities</h2>
+
+<p>I initially tried to do this with two protocols. I was feeling very gung-ho about protocol-oriented programming and was thinking of Swift&rsquo;s protocols like Scala&rsquo;s traits. I had one protocol that described randomly sampling values from a probability distribution</p>
+
+<pre><code>
+protocol Stochastic {
+  // the type of value stored in the distribution
+  associatedtype ValueType
+
+  // Sample a single value from the distribution
+  func get() -> ValueType
+
+  // Sample n values from the distribution
+  func sample(n: Int) -> [ValueType]
+}
+</code></pre>
+
+<p>and another one that allowed for parameterization, for things like the Poisson distribution.</p>
+
+<pre><code>
+protocol Parameterized {
+    associatedtype ParameterType
+    var p: ParameterType { get }
+}
+</code></pre>
+
+<p>You may have noticed that there’s no protocol that allows you to map one distribution into another, which is what would make this into a monad. That’s because I had not yet figured out how to do it with structs or classes. It’s easy to map one set of values drawn from a distribution into another set of values according to a function. But I really needed to create a new struct with a specific <code>get()</code> function. And then I remembered that functions were first class values in Swift!</p>
+
+<p>Turns out you don’t need protocols or classes for this at all. You can do it all with a pretty simple struct!</p>
+
+<h2 id="probability-distributions-via-closures">Probability Distributions via Closures</h2>
+
+<p>With a single generic struct, we have everything we need for the probability monad. To convert one distribution into another, we need only pass in a function that maps elements of one distribution into elements of the other.</p>
+
+<pre><code>
+struct Distribution&lt;A&gt; {
+    var get: () -> A?
+
+    func sample(n: Int) -> [A] {
+        return (1...n).map { x in get()! }
+    }
+
+    func map&lt;B&gt;(using f: @escaping (A) -> B) -> Distribution&lt;B&gt; {
+        var d = Distribution&lt;B&gt;(get: {() -> Optional&lt;B&gt; in return nil})
+        d.get = {
+            (Void) -> B in return f(self.get()!)
+        }
+        return d
+    }
+}
+</code></pre>
+
+<p>First, to do any sampling, we need to generate random numbers. Swift offers <code>arc4random</code> for this. If you&rsquo;re on macOS, you can use the Foundation framework (unsure if <code>arc4random</code> is on Linux). You could also use <a href="https://www.hackingwithswift.com/read/35/3/generating-random-numbers-with-gameplaykit-gkrandomsource">GameplayKit’s GKRandomSource</a> on any of the Apple platforms. Or you can always use something from C.</p>
+
+<pre><code>
+func randomDouble() -> Double {
+  return Double(arc4random()) / Double(UInt32.max)
+}
+</code></pre>
+
+<p>Let’s see what we can do if we start from the <a href="https://en.wikipedia.org/wiki/Uniform_distribution_(continuous)">Uniform distribution</a>. Below, we pass the random number generator function to the distribution&rsquo;s constructor.</p>
+
+<pre><code>
+let uniform = Distribution&lt;Double&gt;(get: randomDouble)
+uniform.sample(5)
+</code></pre>
+
+<p>For starters, we can easily generate the true-false distribution by mapping the Uniform distribution with a function that generates boolean values from a double. From there, it’s straightforward to transform the true-false distribution into the Bernoulli distribution</p>
+
+<pre><code>
+let tf = uniform.map({ $0 < 0.7 })
+tf.sample(10)
+
+let bernoulli = tf.map({ $0 ? 1 : 0 })
+bernoulli.sample(10)
+</code></pre>
+
+<p>By passing the appropriate transformation function or closure to the <code>map</code> function, one type of distribution can be converted into another.</p>
+
+<h2 id="composing-distributions">Composing Distributions</h2>
+
+<p>If you want to compose distributions, then our Distribution struct needs to use a <code>flatMap</code> function to map one distribution into another. This works by composing the input function <code>f</code> so that when values are sampled, the values are directly drawn from the new distribution.</p>
+
+<pre><code>
+func map&lt;B&gt;(using f: @escaping (A) -> Distribution&lt;B&gt;) -> Distribution&lt;B&gt; {
+    var d = Distribution&lt;B&gt;(get: { () -> Optional&lt;B&gt; in return nil })
+    d.get = {
+        (Void) -> B in return f(self.get()!).get()!
+    }
+    return d
+}
+</code></pre>
+
+<p>One example of composing distributions comes from combining a pair of six-sided dice. We can start with a single die. (For this, we need to generate random integers)</p>
+
+<pre><code>
+func nextInt(min min: Int, max: Int) -> ((Void) -> Int) {
+     assert(max > min)
+     return { () in return Int(arc4random_uniform(UInt32((max - min) + 1))) + min }
+ }
+
+ let die6 = Distribution&lt;Int&gt;(get: nextInt(min: 1, max: 6))
+ die6.sample(10)
+ </code></pre>
+
+<p>Next, we can use the flatMap function to compose the distributions of a pair of six-sided dice by passing in a function that combines the rolls of a pair of dice.</p>
+
+<pre><code>
+let dice = die6.flatMap({
+  (d1: Int) in return die6.map({ (d2: Int) in return d1 + d2 })
+})
+
+dice.sample(10)
+</code></pre>
+
+<p>Now that you’ve seen all the pieces, here’s the final form of the probability distribution struct:</p>
+
+<pre><code>
+struct Distribution&lt;A&gt; {
+    var get: () -> A?
+
+    func sample(n: Int) -> [A] {
+        return (1...n).map { x in get()! }
+    }
+
+    func map&lt;B&gt;(using f: @escaping (A) -> B) -> Distribution&lt;B&gt; {
+        var d = Distribution&lt;B&gt;(get: { () -> Optional&lt;B&gt; in return nil })
+        d.get = {
+            (Void) -> B in return f(self.get()!)
+        }
+        return d
+    }
+
+    func mapDistribution&lt;B&gt;(using f: @escaping (A) -> Distribution&lt;B&gt;) -> Distribution&lt;B&gt; {
+        var d = Distribution&lt;B&gt;(get: { () -> Optional&lt;B&gt; in return nil })
+        d.get = {
+            (Void) -> B in return f(self.get()!).get()!
+        }
+        return d
+    }
+
+    let N = 10000
+    func prob(of predicate: (A) -> Bool) -> Double {
+        return Double(sample(n: N).filter(predicate).count) / Double(N)
+    }
+
+    func mean() -> Double {
+        return sample(n: N).reduce(0, { $0 + Double(String(describing: $1))! }) / Double(N)
+    }
+
+    func variance() -> Double {
+        var sum: Double = 0
+        var sqrSum: Double = 0
+
+        for x in sample(n: N) {
+            let xx = Double(String(describing: x))!
+            sum += xx
+            sqrSum += xx * xx
+        }
+
+        return (sqrSum - sum * sum / Double(N)) / Double(N-1)
+    }
+
+    func stdDev() -> Double {
+        return sqrt(self.variance())
+    }
+}
+</code></pre>
+
+<h2 id="computing-statistics-for-a-distribution">Computing Statistics for a Distribution</h2>
+
+<p>You may have noticed a few functions for summary statistics (mean, etc) and probability computation. The most important function is <code>prob</code>, which lets you use predicates to ask questions of the distribution. There are a few basic examples of what you can do below.</p>
+
+<pre><code>
+uniform.mean() // Approximately 0.5
+
+uniform.prob(of: { $0 > 0.7 })   // Approximately 0.3
+
+dice.prob(of: { $0 == 7 })   // Approximately 1/6
+</code></pre>
+
+<p>If I can figure how to properly implement the <code>given()</code> function I’ll add that in a future post. I also want to be able to handle more interesting distributions, like that seen in a probabilistic graphical model.</p>
+
+<p>The code is at <a href="https://github.com/klgraham/probability-monad">https://github.com/klgraham/probability-monad</a>.</p>
+</div>
+
+    
+    
+
+    
+
+</main>
+
+        <footer>
+
+            <p class="copyright text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+
+        </footer>
+
+    </body>
+
+</html>
+

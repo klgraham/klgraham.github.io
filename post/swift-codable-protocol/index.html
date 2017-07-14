@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+    <head>
+
+        <title>The Beauty of Swift 4&#39;s Codable Protocol</title>
+
+        <style>
+
+    html body {
+        font-family: Quicksand, sans-serif;
+        background-color: white;
+    }
+
+    :root {
+        --accent: red;
+        --border-width:  5px ;
+    }
+
+</style>
+
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quicksand">
+
+
+ <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/solarized-dark.min.css"> 
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+ 
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/swift.min.js"></script>  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script>  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/java.min.js"></script>  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/kotlin.min.js"></script>  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/scala.min.js"></script> 
+
+    <script>hljs.initHighlightingOnLoad();</script>
+
+
+
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+ <meta name="generator" content="Hugo 0.25.1" />
+
+        <meta charset="utf-8">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    </head>
+
+    <body>
+
+        <nav class="navbar navbar-default navbar-fixed-top">
+
+            <div class="container">
+
+                <div class="navbar-header">
+
+                    <a class="navbar-brand visible-xs" href="#">The Beauty of Swift 4&#39;s Codable Protocol</a>
+
+                    <button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+
+                </div>
+
+                <div class="collapse navbar-collapse">
+
+                    
+                        <ul class="nav navbar-nav">
+                            
+                                <li><a href="/">Home</a></li>
+                            
+                                <li><a href="/post/">Posts</a></li>
+                            
+                                <li><a href="/project/">Projects</a></li>
+                            
+                        </ul>
+                    
+
+                    
+                        <ul class="nav navbar-nav navbar-right">
+                            
+                                <li class="navbar-icon"><a href="https://github.com/klgraham/"><i class="fa fa-github"></i></a></li>
+                            
+                                <li class="navbar-icon"><a href="https://twitter.com/klogram/"><i class="fa fa-twitter"></i></a></li>
+                            
+                                <li class="navbar-icon"><a href="https://www.linkedin.com/in/klgraham/"><i class="fa fa-linkedin"></i></a></li>
+                            
+                        </ul>
+                    
+
+                </div>
+
+            </div>
+
+        </nav>
+
+
+<main>
+
+    <div class="item">
+
+    
+
+        <h4><a href="/post/swift-codable-protocol/">The Beauty of Swift 4&#39;s Codable Protocol</a></h4>
+
+        <h5>July 13, 2017</h5>
+
+        
+
+    
+
+</div>
+
+
+    <br> <div class="text-justify">
+
+<p>Swift 4&rsquo;s ’Codable’ protocol makes JSON a first-class citizen in Swift. Swift playgrounds are at <a href="https://github.com/klgraham/json-with-swift4">https://github.com/klgraham/json-with-swift4</a>.</p>
+
+<p>By adding ’Codable’ to a struct or class you can automagically encode its properties as JSON or create it by decoding from JSON. For example, consider a struct that describes a Ford Taurus:</p>
+
+<pre><code>
+struct Car: Codable {
+    var make: String
+    var model: String
+}
+
+let taurus = Car(make: "Ford", model: "Taurus")
+</code></pre>
+
+<h2 id="converting-to-and-from-json">Converting to and from JSON</h2>
+
+<p>To encode the Car struct as JSON, first create a <code>JSONEncoder</code> and then encode the struct.</p>
+
+<pre><code>
+var json: String?
+let encoder = JSONEncoder()
+
+if let encoded = try? encoder.encode(taurus) {
+    if let jsonString = String(data: encoded, encoding: .utf8) {
+        print(jsonString)
+        json = jsonString
+    }
+}
+</code></pre>    
+
+<p>The resulting JSON looks like <code>{&quot;make&quot;:&quot;Ford&quot;,&quot;model&quot;:&quot;Taurus&quot;}</code>, which we can convert back into a Car struct.</p>
+
+<pre><code>
+let decoder = JSONDecoder()
+if let jsonString = json {
+    let jsonData = jsonString.data(using: .utf8)!
+    if let decoded = try? decoder.decode(Car.self, from: jsonData) {
+        print("Make: \(decoded.make)")
+        print("Model: \(decoded.model)\n")
+    }
+}
+// prints out:
+// Make: Ford
+// Model: Taurus
+</code></pre>
+
+<p>But this isn&rsquo;t the most exciting feature.</p>
+
+<h2 id="interacting-with-rest-apis">Interacting with REST APIs</h2>
+
+<p>Let&rsquo;s say you&rsquo;re working on a GitHub app and wanted to access the repos of a given language. You don’t want to know every detail about the repo, just the repo’s name, owner, URL, and number of stars, so you set up a struct for an Owner and one for a repo:</p>
+
+<pre><code>
+struct Owner: Codable {
+    var login: String
+    var url: String
+}
+
+struct Repository: Codable {
+    var name: String
+    var full_name: String
+    var owner: Owner
+    var url: String
+    var stargazers_count: Int
+    var language: String
+}
+</code></pre>
+
+<p>The relevant endpoint of GitHub’s public API is “<a href="https://api.github.com/search/repositories”">https://api.github.com/search/repositories”</a> and we’re going to sort the returned repos in descending order of stars. For example, if you wanted the Swift repos sorted by stars, you’d use “<a href="https://api.github.com/search/repositories?q=language:swift&amp;sort=stars&amp;order=desc”">https://api.github.com/search/repositories?q=language:swift&amp;sort=stars&amp;order=desc”</a>. Enter the URL in your browser search bar and see what you get. The response from GitHub’s server looks like this:</p>
+
+<pre><code>{
+  &quot;total_count&quot;: 284186,
+  &quot;incomplete_results&quot;: false,
+  &quot;items&quot;: [repo_1, repo_2, …]
+}
+</code></pre>
+
+<p>where each repo in the items array contains fields that look like those in the <code>Repository</code> struct defined above and many more. For example, at the time of writing, the first repo in the results is for Alamofire. It looks like this:</p>
+
+<pre><code>{
+      &quot;id&quot;: 22458259,
+      &quot;name&quot;: &quot;Alamofire&quot;,
+      &quot;full_name&quot;: &quot;Alamofire/Alamofire&quot;,
+      &quot;owner&quot;: {
+        &quot;login&quot;: &quot;Alamofire&quot;,
+        &quot;id&quot;: 7774181,
+        &quot;avatar_url&quot;: &quot;https://avatars0.githubusercontent.com/u/7774181?v=3&quot;,
+        &quot;gravatar_id&quot;: &quot;&quot;,
+        &quot;url&quot;: &quot;https://api.github.com/users/Alamofire&quot;,
+        &quot;html_url&quot;: &quot;https://github.com/Alamofire&quot;,
+        &quot;followers_url&quot;: &quot;https://api.github.com/users/Alamofire/followers&quot;,
+        &quot;following_url&quot;: &quot;https://api.github.com/users/Alamofire/following{/other_user}&quot;,
+        &quot;gists_url&quot;: &quot;https://api.github.com/users/Alamofire/gists{/gist_id}&quot;,
+        &quot;starred_url&quot;: &quot;https://api.github.com/users/Alamofire/starred{/owner}{/repo}&quot;,
+        &quot;subscriptions_url&quot;: &quot;https://api.github.com/users/Alamofire/subscriptions&quot;,
+        &quot;organizations_url&quot;: &quot;https://api.github.com/users/Alamofire/orgs&quot;,
+        &quot;repos_url&quot;: &quot;https://api.github.com/users/Alamofire/repos&quot;,
+        &quot;events_url&quot;: &quot;https://api.github.com/users/Alamofire/events{/privacy}&quot;,
+        &quot;received_events_url&quot;: &quot;https://api.github.com/users/Alamofire/received_events&quot;,
+        &quot;type&quot;: &quot;Organization&quot;,
+        &quot;site_admin&quot;: false
+      },
+      &quot;private&quot;: false,
+      &quot;html_url&quot;: &quot;https://github.com/Alamofire/Alamofire&quot;,
+      &quot;description&quot;: &quot;Elegant HTTP Networking in Swift&quot;,
+      &quot;fork&quot;: false,
+      &quot;url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire&quot;,
+      &quot;forks_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/forks&quot;,
+      &quot;keys_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/keys{/key_id}&quot;,
+      &quot;collaborators_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/collaborators{/collaborator}&quot;,
+      &quot;teams_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/teams&quot;,
+      &quot;hooks_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/hooks&quot;,
+      &quot;issue_events_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/issues/events{/number}&quot;,
+      &quot;events_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/events&quot;,
+      &quot;assignees_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/assignees{/user}&quot;,
+      &quot;branches_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/branches{/branch}&quot;,
+      &quot;tags_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/tags&quot;,
+      &quot;blobs_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/git/blobs{/sha}&quot;,
+      &quot;git_tags_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/git/tags{/sha}&quot;,
+      &quot;git_refs_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/git/refs{/sha}&quot;,
+      &quot;trees_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/git/trees{/sha}&quot;,
+      &quot;statuses_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/statuses/{sha}&quot;,
+      &quot;languages_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/languages&quot;,
+      &quot;stargazers_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/stargazers&quot;,
+      &quot;contributors_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/contributors&quot;,
+      &quot;subscribers_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/subscribers&quot;,
+      &quot;subscription_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/subscription&quot;,
+      &quot;commits_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/commits{/sha}&quot;,
+      &quot;git_commits_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/git/commits{/sha}&quot;,
+      &quot;comments_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/comments{/number}&quot;,
+      &quot;issue_comment_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/issues/comments{/number}&quot;,
+      &quot;contents_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/contents/{+path}&quot;,
+      &quot;compare_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/compare/{base}...{head}&quot;,
+      &quot;merges_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/merges&quot;,
+      &quot;archive_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/{archive_format}{/ref}&quot;,
+      &quot;downloads_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/downloads&quot;,
+      &quot;issues_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/issues{/number}&quot;,
+      &quot;pulls_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/pulls{/number}&quot;,
+      &quot;milestones_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/milestones{/number}&quot;,
+      &quot;notifications_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/notifications{?since,all,participating}&quot;,
+      &quot;labels_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/labels{/name}&quot;,
+      &quot;releases_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/releases{/id}&quot;,
+      &quot;deployments_url&quot;: &quot;https://api.github.com/repos/Alamofire/Alamofire/deployments&quot;,
+      &quot;created_at&quot;: &quot;2014-07-31T05:56:19Z&quot;,
+      &quot;updated_at&quot;: &quot;2017-07-13T15:42:37Z&quot;,
+      &quot;pushed_at&quot;: &quot;2017-07-10T17:53:01Z&quot;,
+      &quot;git_url&quot;: &quot;git://github.com/Alamofire/Alamofire.git&quot;,
+      &quot;ssh_url&quot;: &quot;git@github.com:Alamofire/Alamofire.git&quot;,
+      &quot;clone_url&quot;: &quot;https://github.com/Alamofire/Alamofire.git&quot;,
+      &quot;svn_url&quot;: &quot;https://github.com/Alamofire/Alamofire&quot;,
+      &quot;homepage&quot;: &quot;&quot;,
+      &quot;size&quot;: 2814,
+      &quot;stargazers_count&quot;: 24353,
+      &quot;watchers_count&quot;: 24353,
+      &quot;language&quot;: &quot;Swift&quot;,
+      &quot;has_issues&quot;: true,
+      &quot;has_projects&quot;: true,
+      &quot;has_downloads&quot;: true,
+      &quot;has_wiki&quot;: false,
+      &quot;has_pages&quot;: false,
+      &quot;forks_count&quot;: 4233,
+      &quot;mirror_url&quot;: null,
+      &quot;open_issues_count&quot;: 11,
+      &quot;forks&quot;: 4233,
+      &quot;open_issues&quot;: 11,
+      &quot;watchers&quot;: 24353,
+      &quot;default_branch&quot;: &quot;master&quot;,
+      &quot;score&quot;: 1.0
+}
+</code></pre>
+
+<p>But we only want the fields defined in <code>Repository</code>. We don’t want to handle all the fields shown above.</p>
+
+<p>One of the great things about Codable is that you can simply decode the fields that you care about and can ignore the rest. One thing we can do is make a struct for the GitHub response</p>
+
+<pre><code>
+struct GithubResponse: Codable {
+    var total_count: Int
+    var incomplete_results: Bool
+    var items: [Repository]
+}
+</code></pre>
+
+<p>and another to submit the query and decode the response.</p>
+
+<pre><code>
+struct GHReposForLanguage {
+    private let baseUrl = "https://api.github.com/search/repositories"
+    private let starsQuery = "sort=stars&order=desc"
+    let language: String
+    private let encoder = JSONEncoder()
+    private let decoder = JSONDecoder()
+    
+    init(language: String) {
+        self.language = language
+    }
+    
+    var url: String {
+        return "\(baseUrl)?q=language:\(language)&\(starsQuery)"
+    }
+    
+    func getMostStarredRepos(maxCount: Int) -> ArraySlice<Repository>? {
+        if let queryUrl = URL(string: self.url) {
+            if let data = try? Data(contentsOf: queryUrl) {
+                if let response = try? decoder.decode(GithubResponse.self, from: data) {
+                    return response.items[0..&lt;maxCount]
+                }
+            }
+        }
+        
+        return nil
+    }
+}
+</code></pre>
+
+<p>One thing that you’ll notice is that we’re decoding the response into a <code>GithubResponse</code>, where the items array contains <code>Repository</code> structs, which are themselves <code>Codable</code>. Swift 4 handles nested <code>Codable</code> properties with ease! This is another excellent property of the <code>Codable</code> protocol that makes it a joy to code in Swift.</p>
+
+<p>We can put this together into a simple function to print the top repos of a given language.</p>
+
+<pre><code>
+func printTopRepos(of language: String, maxCount: Int = 10) {
+    let query = GHReposForLanguage(language: language)
+    if let topRepos = query.getMostStarredRepos(maxCount: 10) {
+        print("Language: \(language)\n")
+        for repo in topRepos {
+            print(repo.name)
+        }
+        print("\n")
+    }
+}
+
+printTopRepos(of: "clojure")
+printTopRepos(of: "swift")
+printTopRepos(of: "scala")
+</code></pre>
+
+<p>The results, for Clojure, Scala, and Swift, are shown below.</p>
+
+<h4 id="clojure">Clojure</h4>
+
+<pre><code>FiraCode
+LightTable
+clojurescript
+om
+leiningen
+overtone
+icepick
+riemann
+compojure
+clojure-koans
+</code></pre>
+
+<h4 id="swift">Swift</h4>
+
+<pre><code>Alamofire
+awesome-ios
+ReactiveCocoa
+Charts
+SwiftyJSON
+open-source-ios-apps
+swift-algorithm-club
+awesome-swift
+SwiftGuide
+Perfect
+</code></pre>
+
+<h4 id="scala">Scala</h4>
+
+<pre><code>spark
+incubator-predictionio
+playframework
+scala
+shadowsocks-android
+akka
+gitbucket
+finagle
+ArnoldC
+aerosolve
+</code></pre>
+
+<p>For the nitty-gritty details of using the <code>Codable</code> protocol, Ben Scheirman has written an excellent <a href="http://benscheirman.com/2017/06/ultimate-guide-to-json-parsing-with-swift-4/">guide to JSON in Swift 4</a>.</p>
+</div>
+
+    
+    
+
+    
+
+</main>
+
+        <footer>
+
+            <p class="copyright text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io">Hugo</a> and <a href="https://github.com/calintat/minimal">Minimal</a>.</p>
+
+        </footer>
+
+    </body>
+
+</html>
+

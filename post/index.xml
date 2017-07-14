@@ -6,10 +6,21 @@
     <description>Recent content in Posts on Continuous Deformation</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 09 Sep 2016 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 13 Jul 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://klgraham.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>The Beauty of Swift 4&#39;s Codable Protocol</title>
+      <link>https://klgraham.github.io/post/swift-codable-protocol/</link>
+      <pubDate>Thu, 13 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://klgraham.github.io/post/swift-codable-protocol/</guid>
+      <description>Swift 4&amp;rsquo;s ’Codable’ protocol makes JSON a first-class citizen in Swift. Swift playgrounds are at https://github.com/klgraham/json-with-swift4.
+By adding ’Codable’ to a struct or class you can automagically encode its properties as JSON or create it by decoding from JSON. For example, consider a struct that describes a Ford Taurus:
+ struct Car: Codable { var make: String var model: String } let taurus = Car(make: &#34;Ford&#34;, model: &#34;Taurus&#34;)  Converting to and from JSON To encode the Car struct as JSON, first create a JSONEncoder and then encode the struct.</description>
+    </item>
     
     <item>
       <title>Tail Recursion In Scala And Clojure</title>

@@ -35,8 +35,8 @@
       <pubDate>Thu, 13 Jul 2017 00:00:00 +0000</pubDate>
       
       <guid>https://klgraham.github.io/post/swift-codable-protocol/</guid>
-      <description>Swift 4&amp;rsquo;s ’Codable’ protocol makes JSON a first-class citizen in Swift.
-By adding ’Codable’ to a struct or class you can automagically encode its properties as JSON or create it by decoding from JSON. For example, consider a struct that describes a Ford Taurus:
+      <description>Swift 4&amp;rsquo;s Codable protocol makes JSON a first-class citizen in Swift.
+By adding Codable to a struct or class you can automagically encode its properties as JSON or create it by decoding from JSON. For example, consider a struct that describes a Ford Taurus:
  struct Car: Codable { var make: String var model: String } let taurus = Car(make: &#34;Ford&#34;, model: &#34;Taurus&#34;)  Converting to and from JSON To encode the Car struct as JSON, first create a JSONEncoder and then encode the struct.</description>
     </item>
     
